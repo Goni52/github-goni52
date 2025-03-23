@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:title" content="거제중앙고등학교 2025. 1학기 상담주간 신청">
+  <meta property="og:description" content="학부모 상담 예약 신청을 위한 웹폼입니다. 학년/반/상담일/시간을 선택해주시고 신청해주세요.">
+  <meta property="og:image" content="https://source.unsplash.com/600x400/?school,education">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://your-deployment-url.com">
+  <title>거제중앙고등학교 상담 신청</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 100%; margin: 0 auto; padding: 30px; box-sizing: border-box; font-size: 2.2rem; line-height: 1.8; background-color: #f7f9fc; }
+    .form-section { background-color: #ffffff; border-radius: 16px; padding: 30px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); margin-bottom: 40px; }
+    h1 { font-size: 4.5rem; text-align: center; margin-bottom: 5px; }
+    h3 { font-size: 3.2rem; text-align: center; margin-top: 5px; margin-bottom: 40px; }
+    .description { text-align: center; font-size: 2.2rem; margin-bottom: 40px; line-height: 1.6; }
+    .description p { margin: 10px 0; }
+    label, select, input, textarea, button { display: block; width: 100%; margin-bottom: 32px; font-size: 3rem; box-sizing: border-box; }
+    label::before { counter-increment: section; content: counter(section) ". "; font-weight: bold; }
+    body { counter-reset: section; }
+    hr { border: none; border-top: 2px solid #ccc; margin: 40px 0; }
+    button { background-color: #4CAF50; color: white; border: none; padding: 28px; border-radius: 14px; cursor: pointer; font-size: 3rem; font-weight: bold; }
+    button:hover { background-color: #45a049; }
+    @media screen and (max-width: 480px) {
+      body { padding: 20px; }
+      h1 { font-size: 3.4rem; }
+      h3 { font-size: 2.8rem; }
+      label, select, input, textarea, button { font-size: 2.6rem; }
+      .form-section { padding: 24px; }
+      button { padding: 24px; }
+    }
+  </style>
+  <script>
+    let currentTimes = [];
+    function submitForm() {
+      const grade = document.getElementById("grade").value;
+      const cls = document.getElementById("class").value;
+      const day = document.getElementById("day").value;
+      const time = document.getElementById("time").value;
+      const studentName = document.getElementById("studentName").value;
+      const parentName = document.getElementById("parentName").value;
+      const contactInfo = document.getElementById("contactInfo").value;
+      const notes = document.getElementById("notes").value;
+      if (!studentName || !parentName || !contactInfo || !grade || !cls || !day || !time) {
+        alert("모든 필수 항목을 입력해주시기 바랍니다."); return;
+      }
+      google.script.run.withSuccessHandler(() => {
+        alert("상담 예약이 정상적으로 완료되었습니다. 감사합니다.");
+        document.getElementById("studentName").value = "";
+        document.getElementById("parentName").value = "";
+        document.getElementById("contactInfo").value = "";
+        document.getElementById("grade").value = "";
+        document.getElementById("class").value = "";
+        document.getElementById("day").value = "";
+        document.getElementById("time").value = "";
+        document.getElementById("notes").value = "";
+        onDropdownChange();
+      }).submitReservation(grade, cls, day, time, studentName, parentName, contactInfo, notes);
+    }
+    function onDropdownChange() {
+      const grade = document.getElementById("grade").value;
+      filterClassOptions(grade);
+      const cls = document.getElementById("class").value;
+      const day = document.getElementById("day").value;
+      if (grade && cls && day) {
+        google.script.run.withSuccessHandler(updateTimeOptions).getAvailableTimes(grade, cls, day);
+      }
+    }
+    function updateTimeOptions(times) {
+      currentTimes = times;
+      const timeSelect = document.getElementById("time");
+      timeSelect.innerHTML = "";
+      if (times.length === 0) {
+        const option = document.createElement("option");
+        option.textContent = "신청 가능한 시간이 없습니다.";
+        option.disabled = true;
+        timeSelect.appendChild(option);
+      } else {
+        times.forEach(t => {
+          const option = document.createElement("option");
+          option.value = t;
+          option.textContent = t;
+          timeSelect.appendChild(option);
+        });
+      }
+    }
+    function filterClassOptions(grade) {
+      const classSelect = document.getElementById("class");
+      const options = classSelect.options;
+      for (let i = 0; i < options.length; i++) {
+        const value = parseInt(options[i].value);
+        if ((grade === "3") && (value === "12" || value === "13")) {
+          options[i].hidden = true;
+        } else {
+          options[i].hidden = false;
+        }
+      }
+      if (grade === "3" && (classSelect.value === "12" || classSelect.value === "13")) {
+        classSelect.value = "";
+      }
+    }
+    window.onload = function () {
+      document.getElementById("grade").addEventListener("change", onDropdownChange);
+      onDropdownChange();
+    };
+  </script>
+</head>
+<body>
+  <div class="form-section">
+    <h1>🎓 거제중앙고등학교 🎓</h1>
+    <h3>🏫 2025. 1학기 상담주간 상담 신청 📅</h3>
+    <div class="description">
+      <p>상담 신청을 위해 정보를 입력해 주세요.<br>(필수 항목<span style="color:red">*</span>: 이름, 학년, 반, 상담요일 및 시간)</p>
+      <p>기타 상담 문의사항</p>
+      <p>- 1학년부: 055)951-2541</p>
+      <p>- 2학년부: 055)951-2553</p>
+      <p>- 3학년부: 055)951-2565</p>
+    </div>
+    <label for="studentName">자녀의 이름을 입력해 주세요.<span style="color:red">*</span></label>
+    <input type="text" id="studentName" placeholder="자녀 이름" required>
+    <label for="parentName">학부모님의 성함을 입력해 주세요.<span style="color:red">*</span></label>
+    <input type="text" id="parentName" placeholder="학부모 성함" required>
+    <label for="contactInfo">연락처를 입력해 주세요.</label>
+    <input type="text" id="contactInfo" placeholder="010-0000-0000" required>
+    <label for="grade">자녀의 학년을 선택해 주세요.<span style="color:red">*</span></label>
+    <select id="grade" required>
+      <option value="">학년 선택</option>
+      <option value="1">1학년</option>
+      <option value="2">2학년</option>
+      <option value="3">3학년</option>
+    </select>
+    <label for="class">자녀의 반을 선택해 주세요.<span style="color:red">*</span></label>
+    <select id="class" onchange="onDropdownChange()" required>
+      <option value="">반 선택</option>
+      <option value="1">1반</option>
+      <option value="2">2반</option>
+      <option value="3">3반</option>
+      <option value="4">4반</option>
+      <option value="5">5반</option>
+      <option value="6">6반</option>
+      <option value="7">7반</option>
+      <option value="8">8반</option>
+      <option value="9">9반</option>
+      <option value="10">10반</option>
+      <option value="11">11반</option>
+      <option value="12">12반</option>
+      <option value="13">13반</option>
+    </select>
+    <label for="day">희망 상담 요일을 선택해 주세요.<span style="color:red">*</span></label>
+    <select id="day" onchange="onDropdownChange()" required>
+      <option value="">요일 선택</option>
+      <option value="월요일">4월 14일 월요일 (1일차)</option>
+      <option value="화요일">4월 15일 화요일 (2일차)</option>
+      <option value="수요일">4월 16일 수요일 (3일차)</option>
+      <option value="목요일">4월 17일 목요일 (4일차)</option>
+      <option value="금요일">4월 18일 금요일 (5일차)</option>
+    </select>
+    <label for="time">상담 희망 시간을 선택해 주세요.<span style="color:red">*</span></label>
+    <select id="time" required></select>
+    <hr>
+    <label for="notes">상담 관련하여 전달하고 싶은 내용을 자유롭게 입력해 주세요.</label>
+    <textarea id="notes" rows="4" placeholder="특이사항 또는 전달사항"></textarea>
+    <hr>
+    <button onclick="submitForm()">📩 상담 신청하기</button>
+  </div>
+</body>
+</html>
